@@ -5,7 +5,7 @@ import pandas as pd
 import argparse
 from pathlib import Path
 
-def generate_dataframes(id_location, save_location, data_location):
+def generate_dataframes(id_location, save_location, data_location, word_limit):
     os.makedirs(save_location, exist_ok=True)
     gold_data = json.load(open(data_location, 'r', encoding='utf-8'))
     id_to_doc = {}
@@ -24,18 +24,22 @@ def generate_dataframes(id_location, save_location, data_location):
     ]:
         rows = []
         ids = id_file[id_key]
+        
         for id_list in ids:
-            id_list = [str(doc_id) for doc_id in id_list]
-            text = ''
+            words_per_doc = word_limit // len(id_list)
+            total_text = ''
             # clean up white space
             for doc_id in id_list: 
-                text += id_to_doc[str(doc_id)]['text'].replace('\n', ' ').replace('\r', '').replace('\t', ' ').strip() + ' '
+                doc_text = id_to_doc[str(doc_id)]['text'].replace('\n', ' ').replace('\r', '').replace('\t', ' ').strip()
+                doc_text = ' '.join(doc_text.split(' ')[:words_per_doc])
+                total_text += doc_text + (' ' if doc_id != id_list[-1] else '')
+                
             rows.append({
                 "author": author_str_to_id[id_to_doc[id_list[0]]['author']],
                 "genre": id_to_doc[id_list[0]]['genre'],
                 "time": id_to_doc[id_list[0]]['date'],
                 "id": ','.join([str(x) for x in id_list]),
-                "text": text
+                "text": total_text
             })
          
         pd.DataFrame(rows).to_csv(os.path.join(save_location, csv_name), sep=',', quotechar='"', index=False)
@@ -51,6 +55,7 @@ def main():
     parser.add_argument('--id_file', type=str, help='Name of experiment id file.')
     parser.add_argument('--output_folder', type=str, default='output', help='Name of output folder for train, val, and test dataframes.')
     parser.add_argument('--data_file', type=str, default='data/crossnews_gold.json', help='Location of data file.')
+    parser.add_argument('--word_limit', type=int, default=512, help='Word limit for each datum generated. Will equally divide word count between documents.')
     
     params = parser.parse_args(sys.argv[1:])
     
@@ -62,7 +67,7 @@ def main():
     save_location = os.path.join(params.output_folder, params.id_file)
         
     
-    generate_dataframes(id_location, save_location, params.data_file)
+    generate_dataframes(id_location, save_location, params.data_file, params.word_limit)
     
 if __name__ == '__main__':
     main()
