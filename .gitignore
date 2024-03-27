@@ -2,3 +2,5 @@ tmp
 data/
 output
 __pycache__
+metrics.ipynb
+pairs
