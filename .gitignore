@@ -1,6 +1,7 @@
 tmp
-data/
+raw_data/
 output
 __pycache__
-metrics.ipynb
+*.ipynb
 pairs
+verification_data
