@@ -5,3 +5,5 @@ __pycache__
 *.ipynb
 pairs
 verification_data
+src/verification_models/O2D2/cc.en.300.bin
+src/verification_models/pos_tagger

@@ -1,0 +1,54 @@
+{
+    "default": {
+        "char_n": 3,
+        "num_search_iters": 2,
+        "selected_features": [
+            "char_distr",
+            "word_distr",
+            "pos_tag_distr",
+            "pos_tag_chunks_distr",
+            "pos_tags_chunks_subtree_distr",
+            "special_char_distr",
+            "hapax_legomena",
+            "character_count",
+            "distr_chars_per_word",
+            "avg_chars_per_word",
+            "word_count",
+            "pos_tag_stats"
+        ]
+    },
+    "distributions_only": {
+        "char_n": 3,
+        "num_search_iters": 2,
+        "selected_features": [
+            "char_distr",
+            "word_distr",
+            "pos_tag_distr",
+            "special_char_distr"
+        ]
+    },
+    "pos_tags": {
+        "char_n": 3,
+        "num_search_iters": 2,
+        "selected_features": [
+            "pos_tag_distr",
+            "pos_tag_chunks_distr",
+            "pos_tags_chunks_subtree_distr",
+            "pos_tag_stats"
+        ]
+    },
+    "no_pos": {
+        "char_n": 3,
+        "num_search_iters": 2,
+        "selected_features": [
+            "char_distr",
+            "word_distr",
+            "special_char_distr",
+            "hapax_legomena",
+            "character_count",
+            "distr_chars_per_word",
+            "avg_chars_per_word",
+            "word_count"
+        ]
+    }
+}

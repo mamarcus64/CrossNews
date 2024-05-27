@@ -1,6 +1,30 @@
 # CrossNews
-Data for the CrossNews authorship dataset.
-## Usage
-The gold and silver splits of CrossNews are located in `data.zip`. To generate the dataframes used in experimental training, please see `ids_to_files.py`. For example, to generate the dataframes for the main experiment, extract `data.zip` into the `data` folder, then run:
+Data and experimental code for the CrossNews authorship dataset.
+## Conda Environment Installation
+Please run the following code to generate and activate the CrossNews conda environment:
 
-`python ids_to_files.py --id_file main_experiment`
+```
+conda create --name CrossNews --file requirements.txt`
+conda activate CrossNews
+```
+
+## Dataset Extraction
+The gold and silver splits of CrossNews are located in `raw_data.zip`. Extract this file into the `raw_data` folder. To generate the dataframes used in experimental training, please run:
+
+`python src/dataset_creation.py`
+
+## Usage
+
+to be written later, see `src/main.py` for command line details. Example usage:
+
+```
+python src/main.py \
+--model random \
+--train \
+--train_file verification_data/train/CrossNews_Article_Article.csv \
+--parameter_sets all \
+--test \
+--test_files verification_data/train/CrossNews_Article_Article.csv \
+verification_data/train/CrossNews_Article_Tweet.csv \
+verification_data/train/CrossNews_Tweet_Tweet.csv
+```
