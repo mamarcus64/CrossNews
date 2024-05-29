@@ -636,7 +636,7 @@ class NGram(VerificationModel):
         with open(os.path.join(folder, 'model.p'), 'rb') as f:
             self.clf, self.transformer, self.scaler, self.secondary_scaler = pickle.load(f)
     
-    def evaluate_internal(self, df):
+    def evaluate_internal(self, df, df_name=None):
         
         print('Processing test data...')
         self.test_data = []

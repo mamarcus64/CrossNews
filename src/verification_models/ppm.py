@@ -304,7 +304,7 @@ class PPM(VerificationModel):
         with open(load_file, 'rb') as f:
             self.ppm_order, self.logreg = pickle.load(f)
     
-    def evaluate_internal(self, df):
+    def evaluate_internal(self, df, df_name=None):
         test_data = []
         for _, row in df.iterrows():
             test_data.append([row['label'], row['text0'], row['text1']])

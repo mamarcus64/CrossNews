@@ -1,0 +1,32 @@
+{
+    "default": {
+        "model": "lstm",
+        "seed": 5,
+        "scheduler": "enable",
+        "transformer": "roberta-large",
+        "batch_size": 512,
+        "vbatch_size": 100,
+        "learning_rate": 0.001,
+        "training_steps": 5000,
+        "devices": 1,
+        "load_from_checkpoint": null,
+        "chunk_size": 512,
+        "finetune": false,
+        "every_n_train_steps": 50
+    },
+    "testing": {
+        "model": "lstm",
+        "seed": 5,
+        "scheduler": "enable",
+        "transformer": "google/bert_uncased_L-4_H-256_A-4",
+        "batch_size": 512,
+        "vbatch_size": 100,
+        "learning_rate": 0.001,
+        "training_steps": 184,
+        "devices": 1,
+        "load_from_checkpoint": null,
+        "chunk_size": 512,
+        "finetune": false,
+        "every_n_train_steps": 20
+    }
+}

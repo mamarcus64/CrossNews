@@ -1,16 +1,8 @@
-import pandas as pd
 from datetime import datetime
 import json
-import os
-from pathlib import Path
-import csv
 import shutil
 import multiprocessing
 
-from verification_models.random import Random
-from verification_models.ngram import NGram
-from verification_models.ppm import PPM
-from verification_models.o2d2 import O2D2
 from arguments import get_parser
 
 def main(args):
@@ -24,7 +16,7 @@ def main(args):
     
     debug_print(f'Creating model {args.model}...')
     
-    parameter_file = json.load(open(f'src/verification_parameters/{args.model}.json', 'r'))
+    parameter_file = json.load(open(f'src/model_parameters/{args.model}.json', 'r'))
     
     if args.parameter_sets == ['all']:
         args.parameter_sets = list(parameter_file.keys())
@@ -38,12 +30,16 @@ def main(args):
         parameter_set = parameter_file[parameter_set_name]
     
         if args.model == 'random':
+            from verification_models.random import Random
             model = Random(args, parameter_set)
         elif args.model == 'ngram':
+            from verification_models.ngram import NGram
             model = NGram(args, parameter_set)
         elif args.model == 'ppm':
+            from verification_models.ppm import PPM
             model = PPM(args, parameter_set, num_workers=max(multiprocessing.cpu_count() - 2, 1))
         elif args.model == 'o2d2':
+            from verification_models.o2d2 import O2D2
             model = O2D2(args, parameter_set)
         
         debug_print(f"Created model (parameters {parameter_set_name}) at {model.model_folder}")
@@ -83,46 +79,3 @@ if __name__ == '__main__':
     
     args = get_parser()
     main(args)
-    
-# export LD_LIBRARY_PATH=/nethome/mma81/miniconda3/pkgs/cudatoolkit-11.3.1-h2bc3f7f_2/lib/
-
-"""
-O2D2 to do:
-1. verify run in general
-3. learn how to re-evaluate on different val set
-
-salloc -G a40:2 -c 16
-conda activate O2D2
-cd /nethome/mma81/storage/O2D2
-bash run_o2d2.sh
-
-
-python train_adhominem.py -epochs 4
-
-salloc -c 16 --partition nlprx-lab
-conda activate O2D2
-cd storage/O2D2
-bash run_o2d2.sh
-
-
-conda activate AuthorID
-cd storage/CrossNews
-python src/main.py --model PPM --experiment Train_Tweet_Tweet
-exit
-
-
-salloc -c 8
-conda activate AuthorID_copy
-python src/main.py \
---model ngram \
---train \
---train_file verification_data/train/CrossNews_Article_Article.csv \
---parameter_sets default \
---test \
---test_files verification_data/test/CrossNews_Tweet_Tweet.csv \
-verification_data/test/CrossNews_Article_Article \
-verification_data/test/CrossNews_Article_Tweet
-
-"""
-
-

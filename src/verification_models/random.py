@@ -21,7 +21,7 @@ class Random(VerificationModel):
             self.seed = int(seed_file.readlines()[0])
             random.seed(self.seed)
     
-    def evaluate_internal(self, df):
+    def evaluate_internal(self, df, df_name=None):
         labels = df['label'].tolist()
         return [random.random() for _ in range(len(labels))], labels
     
