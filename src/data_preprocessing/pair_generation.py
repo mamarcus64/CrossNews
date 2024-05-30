@@ -106,7 +106,7 @@ def get_pair_entries(pair_ids, data, shuffle=True):
         same = int(same)
         a = id_to_doc[first_id]
         b = id_to_doc[second_id]
-        pairs.append((same, a['text'], b['text'], a['author'], b['author']))
+        pairs.append((same, a['text'], b['text'], a['author'], b['author'], first_id, second_id))
     
     return pairs
 
@@ -128,10 +128,10 @@ def print_pair_stats(pairs, save=None, genres=None):
     
     if save:
         print(f'Saving to {save}.')
-        columns = ['label', 'text0', 'text1', 'author0', 'author1']
+        columns = ['label', 'text0', 'text1', 'author0', 'author1', 'id0', 'id1']
         if genres is None:
-            df = pd.DataFrame([(pair[0], pair[1], pair[2], pair[3], pair[4]) for pair in pairs], columns=columns)
+            df = pd.DataFrame([(pair[0], pair[1], pair[2], pair[3], pair[4], pair[5], pair[6]) for pair in pairs], columns=columns)
         else:
             columns.extend(['genre0', 'genre1'])
-            df = pd.DataFrame([(pair[0], pair[1], pair[2], pair[3], pair[4], genres[0], genres[1]) for pair in pairs], columns=columns)
+            df = pd.DataFrame([(pair[0], pair[1], pair[2], pair[3], pair[4], pair[5], pair[6], genres[0], genres[1]) for pair in pairs], columns=columns)
         df.to_csv(save, index=False, quoting=csv.QUOTE_ALL)

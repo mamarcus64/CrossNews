@@ -41,6 +41,12 @@ def main(args):
         elif args.model == 'o2d2':
             from verification_models.o2d2 import O2D2
             model = O2D2(args, parameter_set)
+        elif args.model == 'part_av':
+            from verification_models.part_av import PART_AV
+            model = PART_AV(args, parameter_set)
+        elif args.model == 'luar_av':
+            from verification_models.luar_av import LUAR_AV
+            model = LUAR_AV(args, parameter_set)
         
         debug_print(f"Created model (parameters {parameter_set_name}) at {model.model_folder}")
         

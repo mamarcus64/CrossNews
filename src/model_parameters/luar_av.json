@@ -1,0 +1,18 @@
+{
+    "default": {
+        "model_folder": "models/luar/CrossNews_mini/05-30-00-21-05-kidyge",
+        "parameter_set": "default"
+    },
+    "CrossNews_Article_Article": {
+        "model_folder": "models/luar/CrossNews_Article_Article/05-29-01-21-34-urinru",
+        "parameter_set": "default"
+    },
+    "CrossNews_Article_Tweet": {
+        "model_folder": "models/luar/CrossNews_Article_Tweet/05-29-04-02-10-dcvtzh",
+        "parameter_set": "default"
+    },
+    "CrossNews_Tweet_Tweet": {
+        "model_folder": "models/luar/CrossNews_Tweet_Tweet/05-29-04-18-39-xhxgej",
+        "parameter_set": "default"
+    }
+}

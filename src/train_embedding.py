@@ -24,6 +24,9 @@ def main(args):
     if args.model == 'part':
         from embedding_models.part import PART
         model = PART(args, parameter_file[parameter_set_name])
+    if args.model == 'luar':
+        from embedding_models.luar import LUAR
+        model = LUAR(args, parameter_file[parameter_set_name])
     
     debug_print(f"Created model (parameters {parameter_set_name}) at {model.model_folder}")
     

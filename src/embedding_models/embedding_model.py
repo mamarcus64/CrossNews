@@ -18,7 +18,6 @@ class EmbeddingModel(ABC):
         
         if args.load:
             self.model_folder = args.load_folder
-            self.load_model(args.load_folder)
         elif args.train:
             self.model_folder = create_model_folder(self.get_model_name(), args.train_file, args, parameter_set)
             self.train_df = pd.read_csv(args.train_file)
@@ -39,10 +38,6 @@ class EmbeddingModel(ABC):
     
     @abstractmethod
     def train(self):
-        pass
-    
-    @abstractmethod
-    def load_model(self):
         pass
     
     @abstractmethod
