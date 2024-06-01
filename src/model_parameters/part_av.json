@@ -14,5 +14,9 @@
     "CrossNews_Tweet_Tweet": {
         "model_folder": "models/part/CrossNews_Tweet_Tweet/05-28-04-24-54-hpxnqn",
         "parameter_set": "default"
+    },
+    "empty": {
+        "model_folder": "models/part/empty/06-01-00-23-19-kchrxg",
+        "parameter_set": "no_train"
     }
 }

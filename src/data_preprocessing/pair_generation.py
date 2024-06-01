@@ -123,6 +123,7 @@ def print_pair_stats(pairs, save=None, genres=None):
         first_genre_lengths.append(first_length)
         second_genre_lengths.append(second_length)
     
+    print(f'Num authors: {len(authors)}')
     print(f'Avg. chars per first genre: {sum(first_genre_lengths) / len(first_genre_lengths)}')
     print(f'Avg. chars per second genre: {sum(second_genre_lengths) / len(second_genre_lengths)}')
     

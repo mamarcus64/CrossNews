@@ -28,7 +28,7 @@ class PART_AV(VerificationModel):
     def get_model_name(self):
         return 'part_av'
     
-    def get_distances(self, df):
+    def get_distances(self, df, df_name=None):
         id_to_doc = {}
         for _, row in df.iterrows():
             id_to_doc[row['id0']] = row['text0']
@@ -38,6 +38,12 @@ class PART_AV(VerificationModel):
         texts = [id_to_doc[id] for id in ids]
         embeddings = self.part_model.get_embeddings(texts)
         id_to_embedding = {id: embedding for id, embedding in zip(ids, embeddings)}
+        
+        if df_name:
+            embedding_folder = os.path.join(self.model_folder, 'embeddings')
+            os.makedirs(embedding_folder, exist_ok=True)
+            embedding_path = os.path.join(embedding_folder, f'{df_name}.json')
+            json.dump(id_to_embedding, open(embedding_path, 'w'), indent=4)
         
         distances = []
         
@@ -73,7 +79,7 @@ class PART_AV(VerificationModel):
         pass
     
     def evaluate_internal(self, df, df_name=None):
-        distances = self.get_distances(df)
+        distances = self.get_distances(df, df_name=df_name)
         labels = df['label'].tolist()
         return [0.5 - (distance - self.threshold) / (1 - self.threshold) * 0.5 if distance >= self.threshold 
                 else 0.5 + (self.threshold - distance) / (self.threshold) * 0.5 for distance in distances], labels

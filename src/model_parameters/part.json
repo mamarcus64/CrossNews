@@ -28,5 +28,20 @@
         "chunk_size": 512,
         "finetune": false,
         "every_n_train_steps": 20
+    },
+    "no_train": {
+        "model": "lstm",
+        "seed": 5,
+        "scheduler": "enable",
+        "transformer": "roberta-large",
+        "batch_size": 1,
+        "vbatch_size": 1,
+        "learning_rate": 0.0000000001,
+        "training_steps": 2,
+        "devices": 1,
+        "load_from_checkpoint": null,
+        "chunk_size": 512,
+        "finetune": false,
+        "every_n_train_steps": 1
     }
 }

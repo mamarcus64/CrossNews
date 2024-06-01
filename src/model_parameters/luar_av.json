@@ -14,5 +14,9 @@
     "CrossNews_Tweet_Tweet": {
         "model_folder": "models/luar/CrossNews_Tweet_Tweet/05-29-04-18-39-xhxgej",
         "parameter_set": "default"
+    },
+    "empty": {
+        "model_folder": "models/luar/empty/05-31-22-07-43-gtxazx",
+        "parameter_set": "no_train"
     }
 }
