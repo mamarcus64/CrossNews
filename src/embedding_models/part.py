@@ -59,18 +59,11 @@ class PART(EmbeddingModel):
         train_part.run(train_file, val_file, self.parameter_set, self.model_folder, train_dataset_name)
     
     def get_embeddings(self, texts):
-        tokenizer = AutoTokenizer.from_pretrained(self.parameter_set['transformer'])
-        checkpoint_folder = os.path.join(self.model_folder, 'model_checkpoint')
-        checkpoint_file = os.path.join(checkpoint_folder, os.listdir(checkpoint_folder)[0])
-        model = ContrastiveLSTMHead.load_from_checkpoint(checkpoint_path=checkpoint_file)
-        
-        # embeddings = []
-        
-        # for text in tqdm(texts):
-        #     tokens = tokenizer([text], return_tensors='pt', truncation=True, padding=True, max_length=512)
-        #     with torch.no_grad():
-        #         embedding = model(tokens.input_ids, tokens.attention_mask)
-        #     embeddings.append(embedding[0,:].tolist())
+        if not hasattr(self, 'model'):
+            self.tokenizer = AutoTokenizer.from_pretrained(self.parameter_set['transformer'])
+            checkpoint_folder = os.path.join(self.model_folder, 'model_checkpoint')
+            checkpoint_file = os.path.join(checkpoint_folder, os.listdir(checkpoint_folder)[0])
+            self.model = ContrastiveLSTMHead.load_from_checkpoint(checkpoint_path=checkpoint_file)
             
         embeddings = []
         batch_texts = []
@@ -78,9 +71,9 @@ class PART(EmbeddingModel):
         for i, text in tqdm(enumerate(texts), total=len(texts)):
             batch_texts.append(text)
             if i == len(texts) - 1 or len(batch_texts) == self.parameter_set['batch_size']:
-                tokens = tokenizer(batch_texts, return_tensors='pt', truncation=True, padding=True, max_length=512)
+                tokens = self.tokenizer(batch_texts, return_tensors='pt', truncation=True, padding=True, max_length=512)
                 with torch.no_grad():
-                    embedding = model(tokens.input_ids, tokens.attention_mask)
+                    embedding = self.model(tokens.input_ids, tokens.attention_mask)
                 for j in range(embedding.shape[0]):
                     embeddings.append(embedding[j,:].tolist())
                 batch_texts = []

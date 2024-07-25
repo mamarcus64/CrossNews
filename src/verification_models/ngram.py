@@ -18,7 +18,6 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.pipeline import FeatureUnion
 from itertools import chain
 from nltk.tag.perceptron import PerceptronTagger
-from nltk.corpus import conll2000
 import nltk
 import nltk.data
 import itertools

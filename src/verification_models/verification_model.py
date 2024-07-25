@@ -20,7 +20,7 @@ class VerificationModel(ABC):
             self.model_folder = args.load_folder
             self.load_model(args.load_folder)
         elif args.train:
-            self.model_folder = create_model_folder(self.get_model_name(), args.train_file, args, parameter_set)
+            self.model_folder = create_model_folder(self.get_model_name(), args.train_file, args, parameter_set, base_folder=args.save_folder)
         if args.train:
             self.train_df = pd.read_csv(args.train_file)
             if args.eval_ratio > 0:
@@ -101,7 +101,7 @@ class VerificationModel(ABC):
         for test_name, test_df in self.test_dfs.items():
             scores, predictions, labels = self.evaluate(test_df, df_name=test_name)
             results_dict[test_name] = scores
-            with open(os.path.join(predictions_folder, f'{test_name}.csv'), 'w') as predictions_file:
+            with open(os.path.join(predictions_folder, f'{test_name}.json'), 'w') as predictions_file:
                 json.dump({'predictions': predictions, 'labels': labels}, predictions_file, indent=4)
         
         with open(os.path.join(self.model_folder, 'test_results.json'), 'w') as results_file:

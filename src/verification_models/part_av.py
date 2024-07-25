@@ -12,32 +12,59 @@ class PART_AV(VerificationModel):
     
     def __init__(self, args, parameter_set):
         super().__init__(args, parameter_set)
-        part_args = {
-            'model': 'part',
-            'train': False,
-            'load': True,
-            'load_folder': parameter_set['model_folder'],
-            'parameter_sets': [parameter_set['parameter_set']],
-            'evaluation_metric': 'F1'
-        }
+        if hasattr(args, 'load') and args.load:
+            part_args = {
+                'model': 'part',
+                'train': False,
+                'load': True,
+                'load_folder': parameter_set['model_folder'],
+                'parameter_sets': [parameter_set['parameter_set']],
+                'evaluation_metric': 'F1'
+            }
+        elif hasattr(args, 'train') and args.train:
+            part_args = {
+                'model': 'part',
+                'load': False,
+                'train': True,
+                'save_folder': args.save_folder,
+                'train_file': args.train_file,
+                'seed': 1234,
+                'eval_ratio': 0.2,
+                'parameter_sets': [parameter_set['parameter_set']],
+                'evaluation_metric': 'F1'
+            }
         
         part_parameter_set = json.load(open('src/model_parameters/part.json', 'r'))[parameter_set['parameter_set']]
         
         self.part_model = PART(SimpleNamespace(**part_args), part_parameter_set)
+        
+        if hasattr(args, 'train') and args.train:
+            self.part_model.train()
+        
+        if 'threshold' in parameter_set:
+            self.threshold = parameter_set['threshold']
+        if 'embedding_folder' in parameter_set:
+            self.embedding_folder = parameter_set['embedding_folder']
     
     def get_model_name(self):
         return 'part_av'
     
     def get_distances(self, df, df_name=None):
-        id_to_doc = {}
-        for _, row in df.iterrows():
-            id_to_doc[row['id0']] = row['text0']
-            id_to_doc[row['id1']] = row['text1']
-            
-        ids = list(id_to_doc.keys())
-        texts = [id_to_doc[id] for id in ids]
-        embeddings = self.part_model.get_embeddings(texts)
-        id_to_embedding = {id: embedding for id, embedding in zip(ids, embeddings)}
+        if not hasattr(self, 'embedding_folder'):
+            id_to_doc = {}
+            for _, row in df.iterrows():
+                id_to_doc[row['id0']] = row['text0']
+                id_to_doc[row['id1']] = row['text1']
+                
+            ids = list(id_to_doc.keys())
+            texts = [id_to_doc[id] for id in ids]
+            embeddings = self.part_model.get_embeddings(texts)
+            id_to_embedding = {id: embedding for id, embedding in zip(ids, embeddings)}
+        else:
+            id_to_embedding = json.load(open(os.path.join(self.embedding_folder, f'{df_name}.json'), 'r'))
+            ks = list(id_to_embedding.keys())
+            for k in ks:
+                id_to_embedding[int(k)] = id_to_embedding[k]
         
         if df_name:
             embedding_folder = os.path.join(self.model_folder, 'embeddings')
@@ -55,6 +82,10 @@ class PART_AV(VerificationModel):
         return distances
     
     def train_internal(self, params):
+        
+        if len(self.eval_df) > 3000:
+            self.eval_df = self.eval_df.sample(n=3000)
+        
         eval_distances = self.get_distances(self.eval_df)
         eval_labels = self.eval_df['label'].tolist()
         

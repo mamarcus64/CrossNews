@@ -3,11 +3,10 @@ import json
 import shutil
 import multiprocessing
 
-from arguments import get_parser
+from arguments import get_attribution_parser
 
 def main(args):
     args.model = args.model.lower()
-    args.evaluation_metric = args.evaluation_metric.lower()
     
     def debug_print(text):
         text = str(text)
@@ -29,27 +28,21 @@ def main(args):
     for parameter_set_name in args.parameter_sets:
         parameter_set = parameter_file[parameter_set_name]
     
-        if args.model == 'random':
-            from verification_models.random import Random
-            model = Random(args, parameter_set)
-        elif args.model == 'ngram':
-            from verification_models.ngram import NGram
-            model = NGram(args, parameter_set)
-        elif args.model == 'ppm':
-            from verification_models.ppm import PPM
-            model = PPM(args, parameter_set, num_workers=max(multiprocessing.cpu_count() - 2, 1))
-        elif args.model == 'o2d2':
-            from verification_models.o2d2 import O2D2
-            model = O2D2(args, parameter_set)
-        elif args.model == 'part_av':
-            from verification_models.part_av import PART_AV
-            model = PART_AV(args, parameter_set)
-        elif args.model == 'luar_av':
-            from verification_models.luar_av import LUAR_AV
-            model = LUAR_AV(args, parameter_set)
-        elif args.model == 'stel_av':
-            from verification_models.stel_av import STEL_AV
-            model = STEL_AV(args, parameter_set)
+        if args.model == 'luar_aa':
+            from attribution_models.luar_aa import LUAR_AA
+            model = LUAR_AA(args, parameter_set)
+        elif args.model == 'part_aa':
+            from attribution_models.part_aa import PART_AA
+            model = PART_AA(args, parameter_set)
+        elif args.model == 'stel_aa':
+            from attribution_models.stel_aa import STEL_AA
+            model = STEL_AA(args, parameter_set)
+        elif args.model == 'ngram_aa':
+            from attribution_models.ngram_aa import NGram_AA
+            model = NGram_AA(args, parameter_set)
+        elif args.model == 'ppm_aa':
+            from attribution_models.ppm_aa import PPM_AA
+            model = PPM_AA(args, parameter_set)
         
         debug_print(f"Created model (parameters {parameter_set_name}) at {model.model_folder}")
         
@@ -86,5 +79,5 @@ def main(args):
     
 if __name__ == '__main__':
     
-    args = get_parser()
+    args = get_attribution_parser()
     main(args)

@@ -53,23 +53,26 @@ class LUAR(EmbeddingModel):
         )
 
     def load_model(self, load_folder):
-        # get the latest checkpoint
-        version = "version_0" if self.params.version is None else self.params.version
-        checkpoint_folder = os.path.join(load_folder, self.params.log_dirname, version, 'checkpoints')
-        if os.path.exists(checkpoint_folder):
-            checkpoint_files = os.listdir(checkpoint_folder)
-            if len(checkpoint_files) > 0:
-                assert len(checkpoint_files) == 1
-                checkpoint_file = checkpoint_files[0]
-                epochs_and_steps = checkpoint_file.replace('epoch=', '').replace('.ckpt', '').split('-step=')
-                epoch_num = int(epochs_and_steps[0])
-                step_num = int(epochs_and_steps[1])
-                
-                resume_from_checkpoint = os.path.join(checkpoint_folder, checkpoint_file)
-                print("Checkpoint: {}".format(resume_from_checkpoint))
+        
+        if not hasattr(self, 'loaded'):
+            self.loaded = True
+            # get the latest checkpoint
+            version = "version_0" if self.params.version is None else self.params.version
+            checkpoint_folder = os.path.join(load_folder, self.params.log_dirname, version, 'checkpoints')
+            if os.path.exists(checkpoint_folder):
+                checkpoint_files = os.listdir(checkpoint_folder)
+                if len(checkpoint_files) > 0:
+                    assert len(checkpoint_files) == 1
+                    checkpoint_file = checkpoint_files[0]
+                    epochs_and_steps = checkpoint_file.replace('epoch=', '').replace('.ckpt', '').split('-step=')
+                    epoch_num = int(epochs_and_steps[0])
+                    step_num = int(epochs_and_steps[1])
+                    
+                    resume_from_checkpoint = os.path.join(checkpoint_folder, checkpoint_file)
+                    print("Checkpoint: {}".format(resume_from_checkpoint))
 
-                checkpoint = torch.load(resume_from_checkpoint)
-                self.model.load_state_dict(checkpoint['state_dict'], strict=False)
+                    checkpoint = torch.load(resume_from_checkpoint)
+                    self.model.load_state_dict(checkpoint['state_dict'], strict=False)
 
     def train(self):
         logger = TensorBoardLogger(self.experiment_dir, name=self.params.log_dirname, version=self.params.version)

@@ -27,6 +27,9 @@ def main(args):
     if args.model == 'luar':
         from embedding_models.luar import LUAR
         model = LUAR(args, parameter_file[parameter_set_name])
+    if args.model == 'stel':
+        from embedding_models.stel import STEL
+        model = STEL(args, parameter_file[parameter_set_name])
     
     debug_print(f"Created model (parameters {parameter_set_name}) at {model.model_folder}")
     

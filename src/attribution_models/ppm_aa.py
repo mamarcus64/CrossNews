@@ -1,20 +1,18 @@
-import pickle
+"""
+This is a modified version of the python file found here:
+    https://github.com/pan-webis-de/teahan03/blob/master/teahan03.py
+"""
 from math import log
+import pickle
 import os
-import json
-import time
-import argparse
-import random
-from tqdm import tqdm
-from sklearn.linear_model import LogisticRegression
-from typing import Dict
-import logging
 import pandas as pd
-from multiprocessing import Pool
-
-from verification_models.verification_model import VerificationModel
-
-
+from tqdm import tqdm
+import time
+from attribution_models.attribution_model import AttributionModel
+import scipy
+import argparse
+import pdb
+from pathlib import Path
 
 class Model(object):
     # cnt - count of characters read
@@ -42,11 +40,11 @@ class Model(object):
         o = self.orders[n]
         s = "Order " + str(n) + ": (" + str(o.cnt) + ")\n"
         for cont in o.contexts:
-            if n > 0:
+            if(n > 0):
                 s += "  '" + cont + "': (" + str(o.contexts[cont].cnt) + ")\n"
             for char in o.contexts[cont].chars:
                 s += "     '" + char + "': " + \
-                     str(o.contexts[cont].chars[char]) + "\n"
+                    str(o.contexts[cont].chars[char]) + "\n"
         s += "\n"
         print(s)
 
@@ -63,19 +61,18 @@ class Model(object):
             context.addChar(c)
         context.incCharCount(c)
         order.cnt += 1
-        if order.n > 0:
+        if (order.n > 0):
             self.update(c, cont[1:])
         else:
             self.cnt += 1
 
     # updates the model with a string
     def read(self, s):
-        s = str(s)
-        if len(s) == 0:
+        if (len(s) == 0):
             return
         for i in range(len(s)):
             cont = ""
-            if i != 0 and i - self.modelOrder <= 0:
+            if (i != 0 and i - self.modelOrder <= 0):
                 cont = s[0:i]
             else:
                 cont = s[i - self.modelOrder:i]
@@ -88,13 +85,13 @@ class Model(object):
 
         order = self.orders[len(cont)]
         if not order.hasContext(cont):
-            if order.n == 0:
+            if (order.n == 0):
                 return 1.0 / self.alphSize
             return self.p(c, cont[1:])
 
         context = order.contexts[cont]
         if not context.hasChar(c):
-            if order.n == 0:
+            if (order.n == 0):
                 return 1.0 / self.alphSize
             return self.p(c, cont[1:])
         return float(context.getCharCount(c)) / context.cnt
@@ -203,11 +200,26 @@ class Context(object):
             del self.chars[c]
 
 
+# returns model object loaded from 'mpath' using pickle
+def load_ppm_model(mpath):
+    f = open(mpath, "rb")
+    m = pickle.load(f)
+    f.close()
+    return m
+
+
+# stores model object 'model' to 'mpath' using pickle
+def store_ppm_model(model, mpath):
+    f = open(mpath, "wb")
+    pickle.dump(model, f)
+    f.close()
+
 # calculates the cross-entropy of the string 's' using model 'm'
 def h(m, s):
-    s = str(s)
+    if type(s) != type('test'):
+        s = str(s) # hack fix
     n = len(s)
-    h = 0
+    _h = 0
     for i in range(n):
         if i == 0:
             context = ""
@@ -215,151 +227,76 @@ def h(m, s):
             context = s[0:i]
         else:
             context = s[i - m.modelOrder:i]
-        h -= log(m.p(s[i], context), 2)
-    return h / n
+        _h -= log(m.p(s[i], context), 2)
+    return _h / n
 
+# creates models of candidates in 'candidates'
+# updates each model with any files stored in the subdirectory of 'corpusdir' named with the candidates name
+# stores each model named under the candidates name in 'modeldir'
+def create_models(data, order, alphsize):
+    models = {}
+    for i in data['author'].unique():
+        models[i] = Model(order, alphsize)
+        print(f"creating model for author {i}")
 
-# Calculates the cross-entropy of text2 using the model of text1 and vice-versa
-# Returns the mean and the absolute difference of the two cross-entropies
-def distance(text1, text2, ppm_order=5, label=None):
-    mod1 = Model(ppm_order, 256)
-    mod1.read(text1)
-    d1 = h(mod1, text2)  # this is essentially perplexity of model trained on 1 and tested on 2
-    mod2 = Model(ppm_order, 256)
-    mod2.read(text2)
-    d2 = h(mod2, text1)
-    # peroplexity 1-on-2, perplexity 2-on-1, average perplexity, perplexity difference
-    if label is not None:
-        return [label, [d1, d2, (d1 + d2) / 2.0, abs(d1 - d2)]]
-    return [d1, d2, (d1 + d2) / 2.0, abs(d1 - d2)]
+        for doc in tqdm(data['text'][data['author'] == i]):
+            models[i].read(str(doc))
 
+    return models
 
-class ppm_training_data_generator:
-    def __init__(self, train_data, ppm_order=5, cache_dir='test', num_workers=0,):
-        self.train_data = train_data
-        self.ppm_order = ppm_order
-        self.cache_dir = cache_dir
-        self.num_workers = num_workers
-
-        self.classifier_training_data = []
-
-    def get_train_data(self):
-        
-        print('Getting train data...')
-        result = []
-        for _, row in tqdm(self.train_data.iterrows(), total=len(self.train_data)):
-            same_diff, text0, text1 = row['label'], row['text0'], row['text1']
-            
-            result.append(distance(text0, text1, self.ppm_order, same_diff))
-        
-        return result
-
-def train_classifier(X_train, y_train):
-    logging.info('fitting the logistic regression model')
-    logreg = LogisticRegression()
-    logreg.fit(X_train, y_train)
-    return logreg
-
-def eval_sample(txt0, txt1, ppm_order, logreg, true_lbl=None, test_index=None):
-    dists = distance(txt0, txt1, ppm_order)
-    proba = logreg.predict_proba([dists])
-    if true_lbl is not None:
-        return proba[0][1], true_lbl, test_index
-    return proba[0][1]
-
-class PPM(VerificationModel):
+# attributes the authorship, according to the cross-entropy ranking.
+# attribution is saved in json-formatted structure 'answers'
+def create_answers(test_data, models):
+    print("attributing authors to unknown texts")
+    candidates = list(sorted(models.keys(), key=lambda x: int(x)))
+    predicted_authors, scores, probs = [], [], []
     
-    def __init__(self, args, parameter_set, num_workers=16):
+    true_authors = list(test_data['author'])
+    texts = list(test_data['text'])
+    for i in tqdm(range(len(true_authors)), desc='Evaluating on target documents'):
+        true_author = true_authors[i]
+        text = texts[i]
+        hs = []
+        for cand in candidates:
+            hs.append(h(models[cand], text))
+        m = min(hs)
+        
+        # convert to probabilities
+        prob = scipy.special.softmax([-x for x in hs]).tolist()
+        probs.append(prob)
+        
+        author = candidates[hs.index(m)]
+        hs.sort()
+        score = (hs[1] - m) / (hs[len(hs) - 1] - m)
+
+        predicted_authors.append(author)
+        scores.append(score)
+
+    return probs
+
+class PPM_AA(AttributionModel):
+    
+    def __init__(self, args, parameter_set):
         super().__init__(args, parameter_set)
-        self.num_workers = num_workers
+        self.parameter_set = argparse.Namespace(**self.parameter_set)
+        os.makedirs(os.path.join(self.model_folder, 'ppm_models'), exist_ok=True)
         
     def get_model_name(self):
-        return 'ppm'
-                
+        return 'ppm_aa'
+    
     def train_internal(self, params):
-        
-        self.ppm_order = params['order']
-        
-        self.temp_path = self.model_folder
-        os.makedirs(self.temp_path, exist_ok=True)
-        
-        data_generator = ppm_training_data_generator(self.train_df, self.ppm_order, self.temp_path, num_workers=self.num_workers)
-        classifier_training_data = data_generator.get_train_data()
-        
-        y_train = []
-        X_train = []
-        for lbl, dists in classifier_training_data:
-            y_train.append(lbl)
-            X_train.append(dists)
-        print('Training the classifier...')
-        # now train the logistic regression classifier
-        self.logreg = train_classifier(X_train, y_train)
-        
+        self.models = create_models(self.query_df, params.order, params.alph_size)
         
     def save_model(self, folder):
-        save_file = os.path.join(folder, 'model.clf')
-        with open(save_file, 'wb') as f:
-            pickle.dump((self.ppm_order, self.logreg), f)
-    
-    def load_model(self, folder):
-        load_file = os.path.join(folder, 'model.clf')
-        with open(load_file, 'rb') as f:
-            self.ppm_order, self.logreg = pickle.load(f)
-    
-    def evaluate_internal(self, df, df_name=None):
-        test_data = []
-        for _, row in df.iterrows():
-            test_data.append([row['label'], row['text0'], row['text1']])
-    
-        probas_and_true_lbls = []
-
-        with Pool(processes=self.num_workers) as pool:
-            async_results, idx = {}, 0
-            for test_index, (true_lbl, txt0, txt1) in enumerate(test_data):
-                async_results[idx] = pool.apply_async(eval_sample, (txt0, txt1, self.ppm_order, self.logreg, true_lbl, test_index))
-                idx += 1
-
-            logging.info(f'PPM_AV: finished launching, now awaiting the processing')
-            done = False
-            start_time = time.time()
-            last_check = time.time()
-            loops = 0
-            num_removed = 0
-            while not done:
-                remove_idxs = []
-                loops += 1
-                for idx, result in async_results.items():
-                    if result.ready():
-                        res = result.get()
-                        # do the things with this data. . .
-                        probas_and_true_lbls.append(res)
-                        remove_idxs.append(idx)
-                num_removed += len(remove_idxs)
-                for idx in remove_idxs:
-                    del async_results[idx]
-                if len(async_results.keys()) < 1:
-                    done = True
-                if time.time() - last_check > 30:
-                    elapsed = time.time() - start_time
-                    res_left = len(list(async_results.keys()))
-                    logging.info(
-                        f'PPM_AV: {res_left} results remaining in queue, {elapsed:.2f}, {num_removed} removed, '
-                        f'{loops} loops ran.')
-                    logging.info(
-                        f'PPM_AV: approximately {(res_left / (num_removed / 30)) / 60} minutes remaining')
-                    last_check = time.time()
-                    num_removed = 0
-
-            logging.info(f'PPM_AV: all evaluation results gathered')
-            probas, true_lbls, test_indices = [], [], []
-            for proba, lbl, test_index in probas_and_true_lbls:
-                probas.append(proba)
-                true_lbls.append(lbl)
-                test_indices.append(test_index)
+        for author, model in self.models.items():
+            store_ppm_model(model, os.path.join(folder, 'ppm_models', f'model_{author}.pkl'))
             
+    def load_model(self, folder):
+        self.models = {}
+        for file in os.listdir(os.path.join(folder, 'ppm_models')):
+            if file.endswith('.pkl'):
+                author = '_'.split(Path(file).stem)[-1]
+                self.models[author] = load_ppm_model(os.path.join(folder, 'ppm_models', file))
         
-        # sort by test_index to restore original order
-        probas = [prob for _, prob in sorted(zip(test_indices, probas), key=lambda pair: pair[0])]
-        true_lbls = [lbl for _, lbl in sorted(zip(test_indices, true_lbls), key=lambda pair: pair[0])]
-        
-        return probas, true_lbls
+    def evaluate_internal(self, query_df, target_df, df_name=None):
+        return create_answers(target_df, self.models)

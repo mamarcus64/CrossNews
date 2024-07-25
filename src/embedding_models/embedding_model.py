@@ -19,7 +19,7 @@ class EmbeddingModel(ABC):
         if args.load:
             self.model_folder = args.load_folder
         elif args.train:
-            self.model_folder = create_model_folder(self.get_model_name(), args.train_file, args, parameter_set)
+            self.model_folder = create_model_folder(self.get_model_name(), args.train_file, args, parameter_set, base_folder=args.save_folder)
             self.train_df = pd.read_csv(args.train_file)
             if args.eval_ratio > 0:
                 self.train_df, self.eval_df = train_test_split(self.train_df, test_size=args.eval_ratio, random_state=args.seed)

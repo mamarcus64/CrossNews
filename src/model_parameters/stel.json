@@ -1,0 +1,12 @@
+{
+    "default": {
+        "epochs": 10,
+        "batch_size": 16,
+        "save_every": 7500
+    },
+    "no_train": {
+        "epochs": 1,
+        "batch_size": 1,
+        "save_every": 1
+    }
+}

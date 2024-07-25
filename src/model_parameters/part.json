@@ -7,7 +7,7 @@
         "batch_size": 512,
         "vbatch_size": 100,
         "learning_rate": 0.001,
-        "training_steps": 5000,
+        "training_steps": 1000,
         "devices": 1,
         "load_from_checkpoint": null,
         "chunk_size": 512,
@@ -22,12 +22,12 @@
         "batch_size": 512,
         "vbatch_size": 100,
         "learning_rate": 0.001,
-        "training_steps": 184,
+        "training_steps": 3,
         "devices": 1,
         "load_from_checkpoint": null,
         "chunk_size": 512,
         "finetune": false,
-        "every_n_train_steps": 20
+        "every_n_train_steps": 2
     },
     "no_train": {
         "model": "lstm",

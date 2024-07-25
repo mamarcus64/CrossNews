@@ -6,15 +6,19 @@ from scipy.spatial.distance import cosine
 import pdb
 
 from verification_models.verification_model import VerificationModel
-from embedding_models.luar import LUAR
+from embedding_models.stel import STEL
 
-class LUAR_AV(VerificationModel):
+class STEL_AV(VerificationModel):
     
     def __init__(self, args, parameter_set):
+        
+        if args.train_file == 'empty.csv':
+            args.train_file = 'CrossNews_mini.csv'
+        
         super().__init__(args, parameter_set)
         if hasattr(args, 'load') and args.load:
-            luar_args = {
-                'model': 'luar',
+            stel_args = {
+                'model': 'stel',
                 'train': False,
                 'load': True,
                 'load_folder': parameter_set['model_folder'],
@@ -22,8 +26,8 @@ class LUAR_AV(VerificationModel):
                 'evaluation_metric': 'F1'
             }
         elif hasattr(args, 'train') and args.train:
-            luar_args = {
-                'model': 'luar',
+            stel_args = {
+                'model': 'stel',
                 'load': False,
                 'train': True,
                 'save_folder': args.save_folder,
@@ -34,23 +38,23 @@ class LUAR_AV(VerificationModel):
                 'evaluation_metric': 'F1'
             }
         
-        luar_parameter_set = json.load(open('src/model_parameters/luar.json', 'r'))[parameter_set['parameter_set']]
+        stel_parameter_set = json.load(open('src/model_parameters/stel.json', 'r'))[parameter_set['parameter_set']]
         
-        self.luar_model = LUAR(SimpleNamespace(**luar_args), luar_parameter_set)
+        self.stel_model = STEL(SimpleNamespace(**stel_args), stel_parameter_set)
         
         if hasattr(args, 'train') and args.train:
-            self.luar_model.train()
-       
+            self.stel_model.train()
+        
         if 'threshold' in parameter_set:
             self.threshold = parameter_set['threshold']
         if 'embedding_folder' in parameter_set:
             self.embedding_folder = parameter_set['embedding_folder']
     
     def get_model_name(self):
-        return 'luar_av'
+        return 'stel_av'
     
     def get_distances(self, df, df_name=None):
-        if not hasattr(self, 'embedding_folder'):
+        if not hasattr(self, 'dembedding_folder'):
             id_to_doc = {}
             for _, row in df.iterrows():
                 id_to_doc[row['id0']] = row['text0']
@@ -58,7 +62,7 @@ class LUAR_AV(VerificationModel):
                 
             ids = list(id_to_doc.keys())
             texts = [id_to_doc[id] for id in ids]
-            embeddings = self.luar_model.get_embeddings(texts)
+            embeddings = self.stel_model.get_embeddings(texts)
             id_to_embedding = {id: embedding for id, embedding in zip(ids, embeddings)}
         else:
             id_to_embedding = json.load(open(os.path.join(self.embedding_folder, f'{df_name}.json'), 'r'))
@@ -116,8 +120,8 @@ salloc -c 16 -G a40
 
 date
 dataset="CrossNews_mini.csv"
-model="luar_av"
-conda activate luar
+model="stel_av"
+conda activate stel
 cd /nethome/mma81/storage/CrossNews
 
 python src/run_verification.py \

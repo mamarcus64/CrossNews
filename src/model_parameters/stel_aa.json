@@ -1,0 +1,56 @@
+{
+    "default": {
+        "model_folder": "models/stel/CrossNews_mini/06-03-21-20-54-gthqba",
+        "parameter_set": "default"
+    },
+    "CrossNews_Article_Article.csv": {
+        "model_folder": "models/stel/CrossNews_Article_Article/06-04-09-08-54-lynhun",
+        "parameter_set": "default"
+    },
+    "CrossNews_Article_Tweet.csv": {
+        "model_folder": "models/stel/CrossNews_Article_Tweet/06-04-13-08-12-yxeulq",
+        "parameter_set": "default"
+    },
+    "CrossNews_Tweet_Tweet.csv": {
+        "model_folder": "models/stel/CrossNews_Tweet_Tweet/06-04-15-51-00-kdnzkk",
+        "parameter_set": "default"
+    },
+    "CrossNews_Article_Article_short.csv": {
+        "model_folder": "models/stel/CrossNews_Article_Article_short/06-04-16-17-02-xxwrjb",
+        "parameter_set": "default"
+    },
+    "CrossNews_Article_Tweet_short.csv": {
+        "model_folder": "models/stel/CrossNews_Article_Tweet_short/06-03-22-17-39-lhorre",
+        "parameter_set": "default"
+    },
+    "empty.csv": {
+        "model_folder": "models/stel/empty/06-03-21-20-54-gthqba",
+        "parameter_set": "no_train",
+        "threshold": 0.6,
+        "embedding_folder": "models/stel_av/empty/06-05-18-45-44-pzrmur/embeddings"
+    },
+    "exp1_A_A": {
+        "model_folder": "runs/experiment_1/stel/CrossNews_Article_Article/06-09-14-06-21-geowkg",
+        "parameter_set": "default"
+    },
+    "exp1_A_T": {
+        "model_folder": "runs/experiment_1/stel/CrossNews_Article_Tweet/06-09-14-06-20-gftuhb",
+        "parameter_set": "default"
+    },
+    "exp1_T_T": {
+        "model_folder": "runs/experiment_1/stel/CrossNews_Tweet_Tweet/06-09-14-06-17-tagjyi",
+        "parameter_set": "default"
+    },
+    "exp2_A_A": {
+        "model_folder": "runs/experiment_2/stel/CrossNews_Article_Article/06-09-14-06-21-cbzmfb",
+        "parameter_set": "default"
+    },
+    "exp2_A_T": {
+        "model_folder": "runs/experiment_2/stel/CrossNews_Article_Tweet/06-09-14-06-49-ispibn",
+        "parameter_set": "default"
+    },
+    "exp2_T_T": {
+        "model_folder": "runs/experiment_2/stel/CrossNews_Tweet_Tweet/06-09-14-06-53-nhuhac",
+        "parameter_set": "default"
+    }
+}
