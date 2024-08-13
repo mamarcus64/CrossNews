@@ -15,7 +15,7 @@ The gold and silver splits of CrossNews are located in `raw_data.zip`. Extract t
 
 ## Usage
 
-to be written later, see `src/main.py` for command line details. Example usage:
+See `src/main.py` for command line details. Example usage:
 
 ```
 python src/main.py \
