@@ -1,0 +1,26 @@
+{
+    "task_only": {
+        "llm_model": "meta-llama/Meta-Llama-3-8B-Instruct",
+        "prompt": "task_only"
+    },
+    "prompt_av": {
+        "llm_model": "meta-llama/Meta-Llama-3-8B-Instruct",
+        "prompt": "prompt_av"
+    },
+    "lip": {
+        "llm_model": "meta-llama/Meta-Llama-3-8B-Instruct",
+        "prompt": "lip"
+    },
+    "task_only_big": {
+        "llm_model": "meta-llama/Meta-Llama-3-70B-Instruct",
+        "prompt": "task_only"
+    },
+    "prompt_av_big": {
+        "llm_model": "meta-llama/Meta-Llama-3-70B-Instruct",
+        "prompt": "prompt_av"
+    },
+    "lip_big": {
+        "llm_model": "meta-llama/Meta-Llama-3-70B-Instruct",
+        "prompt": "lip"
+    }
+}

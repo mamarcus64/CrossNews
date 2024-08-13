@@ -50,6 +50,9 @@ def main(args):
         elif args.model == 'stel_av':
             from verification_models.stel_av import STEL_AV
             model = STEL_AV(args, parameter_set)
+        elif args.model == 'llm_prompting':
+            from verification_models.llm_prompting import LLM_Prompting
+            model = LLM_Prompting(args, parameter_set)
         
         debug_print(f"Created model (parameters {parameter_set_name}) at {model.model_folder}")
         

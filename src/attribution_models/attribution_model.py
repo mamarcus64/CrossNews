@@ -91,6 +91,11 @@ class AttributionModel(ABC):
         """
         all_scores = self.evaluate_internal(self.query_df, self.target_df, df_name=df_name)
         
+        if type(all_scores) == tuple: # logging responses for LLMs
+            all_scores, all_responses = all_scores
+        else:
+            all_scores, all_responses = all_scores, None
+        
         id_to_author = {i: author for author, i in self.author_to_author_id.items()}
         author_ids = sorted(list(id_to_author.keys()))
         author_list = [id_to_author[i] for i in author_ids] # not id's, but original names
@@ -99,15 +104,25 @@ class AttributionModel(ABC):
         
         for i, scores in enumerate(all_scores):
             row = self.target_df.iloc[i]
-                    
-            results.append({
-                'id': str(row['id']),
-                'genre': row['genre'],
-                'label': id_to_author[row['author']],
-                'prediction': id_to_author[scores.index(max(scores))],
-                'rank': sorted(scores, reverse=True).index(scores[row['author']]) + 1,
-                'distances': scores
-            })
+            if all_responses is not None:
+                results.append({
+                    'id': str(row['id']),
+                    'genre': row['genre'],
+                    'label': id_to_author[row['author']],
+                    'prediction': id_to_author[scores.index(max(scores))],
+                    'rank': sorted(scores, reverse=True).index(scores[row['author']]) + 1,
+                    'response': all_responses[i],
+                    'scores': scores
+                })
+            else:
+                results.append({
+                    'id': str(row['id']),
+                    'genre': row['genre'],
+                    'label': id_to_author[row['author']],
+                    'prediction': id_to_author[scores.index(max(scores))],
+                    'rank': sorted(scores, reverse=True).index(scores[row['author']]) + 1,
+                    'scores': scores
+                })
         
         return results, author_list
         
