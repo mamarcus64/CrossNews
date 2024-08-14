@@ -79,23 +79,3 @@ class PART(EmbeddingModel):
                 batch_texts = []
         
         return embeddings
-    
-"""
-
-salloc -c 16 -G a40
-
-date
-dataset="CrossNews_mini.csv"
-model="part"
-conda activate part
-cd /nethome/mma81/storage/CrossNews
-
-python src/train_embedding.py \
---model ${model} \
---train \
---train_file verification_data/train/${dataset} \
---parameter_sets testing
-date
-exit
-
-"""

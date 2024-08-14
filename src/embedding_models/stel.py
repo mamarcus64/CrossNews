@@ -52,15 +52,3 @@ class STEL(EmbeddingModel):
             for i in range(batch_embeddings.shape[0]):
                 embeddings.append([float(x) for x in list(batch_embeddings[i,:])])
         return embeddings
-
-"""
-
-python src/train_embedding.py --model stel --train --train_file verification_data/train/CrossNews_mini.csv --parameter_sets default
-
-
-python src/train_embedding.py --model stel --load --load_folder models/stel/CrossNews_mini/06-03-21-20-54-gthqba --parameter_sets default \
-    --test --test_files verification_data/test/CrossNews_Article_Article.csv verification_data/test/CrossNews_Article_Tweet.csv
-
-
-
-"""

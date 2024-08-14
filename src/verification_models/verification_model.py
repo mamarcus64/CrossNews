@@ -18,7 +18,6 @@ class VerificationModel(ABC):
         
         if args.load:
             self.model_folder = args.load_folder
-            self.load_model(args.load_folder)
         elif args.train:
             self.model_folder = create_model_folder(self.get_model_name(), args.train_file, args, parameter_set, base_folder=args.save_folder)
         if args.train:

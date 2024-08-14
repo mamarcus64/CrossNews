@@ -32,7 +32,7 @@ class LLM_Prompting(VerificationModel):
         
     
     def get_model_name(self):
-        return f'prompting_{self.prompt_type}' if '70B' not in self.llm_model_type else f'prompting_{self.prompt_type}_big'
+        return f'prompting_{self.args.parameter_set}'
     
     def train_internal(self, params):
         pass

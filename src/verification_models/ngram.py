@@ -8,7 +8,6 @@ import time
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import SGDClassifier
 from sklearn.metrics import roc_curve, auc
-from sklearn.utils.fixes import loguniform
 from sklearn.model_selection import RandomizedSearchCV
 import os
 import re
@@ -39,10 +38,7 @@ treebank_tokenizer = nltk.tokenize.TreebankWordTokenizer()
 
 nlp_stanza = None  # stanza.Pipeline(lang='en', processors='tokenize', tokenize_no_ssplit=True)
 nlp_spacy = None  # spacy.load("en_core_web_sm", disable=['ner'])
-
 tagger = nltk.data.load(os.path.join(dirname, "pos_tagger/treebank_brill_aubt.pickle"))
-# if throwing error, might need to run this line in console:
-# nltk.download('averaged_perceptron_tagger')
 perceptron_tagger = PerceptronTagger()
 
 ground_truth = {}
@@ -600,7 +596,7 @@ class NGram(VerificationModel):
         
         print('Tuning parameters...', flush=True)
 
-        param_dist = {'alpha': loguniform(1e-4, 1e0)}
+        param_dist = {'alpha': [1e-4, 1e-3, 1e-2, 1e-1, 1e0]}
         batch_size = 100
         clf = SGDClassifier(loss='log', alpha=0.01, n_jobs=32)
         n_iter_search = self.num_search_iters

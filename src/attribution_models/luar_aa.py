@@ -7,6 +7,7 @@ import pdb
 from pathlib import Path
 from tqdm import tqdm
 import numpy as np
+import pandas as pd
 
 from attribution_models.attribution_model import AttributionModel
 from embedding_models.luar import LUAR
@@ -30,7 +31,7 @@ class LUAR_AA(AttributionModel):
                 'load': False,
                 'train': True,
                 'save_folder': args.save_folder,
-                'train_file': args.query_file,
+                'train_file': args.train_file,
                 'seed': 1234,
                 'eval_ratio': 0.2,
                 'parameter_sets': [parameter_set['parameter_set']],
@@ -39,15 +40,17 @@ class LUAR_AA(AttributionModel):
         
         luar_parameter_set = json.load(open('src/model_parameters/luar.json', 'r'))[parameter_set['parameter_set']]
         
-        # self.luar_model = LUAR(SimpleNamespace(**luar_args), luar_parameter_set)
+        self.luar_model = LUAR(SimpleNamespace(**luar_args), luar_parameter_set)
         
-        # if hasattr(args, 'train') and args.train:
-            # self.luar_model.train()
+        if hasattr(args, 'train') and args.train:
+            self.luar_model.train()
+        elif hasattr(args, 'load') and args.load:
+            self.part_model.load_model(args.load_folder)
        
-        # if 'embedding_folder' in parameter_set:
-            # self.embedding_folder = parameter_set['embedding_folder']
-        args.query_file = 'CrossNews_Article.csv'
-        self.id_to_embedding = json.load(open(f'gold_embeddings/luar/{Path(args.query_file).stem}.json', 'r'))
+        if 'threshold' in parameter_set:
+            self.threshold = parameter_set['threshold']
+        if 'embedding_folder' in parameter_set:
+            self.embedding_folder = parameter_set['embedding_folder']
     
     def get_model_name(self):
         return 'luar_aa'
@@ -62,6 +65,13 @@ class LUAR_AA(AttributionModel):
         pass
     
     def evaluate_internal(self, query_df, target_df, df_name=None):
+        
+        self.id_to_embedding = {}
+        ids_and_texts = pd.concat([query_df, target_df])[['id', 'text']]
+        ids = ids_and_texts['id'].tolist()
+        texts = ids_and_texts['text'].tolist()
+        for doc_id, embedding in zip(ids, self.luar_model.get_embeddings(texts)):
+            self.id_to_embedding[str(doc_id)] = embedding
         
         author_ids = sorted(list(set(target_df['author'])))
         query_embeddings = []

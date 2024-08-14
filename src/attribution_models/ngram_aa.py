@@ -20,9 +20,8 @@ def base_preprocessor(string: str) -> str:
     """
     Function that computes regular expressions.
     """
-    string = re.sub("[0-9]", "0", string)  # each digit will be represented as a 0
+    string = re.sub("[0-9]", "0", string)
     string = re.sub(r'( \n| \t)+', '', string)
-    # text = re.sub("[0-9]+(([.,^])[0-9]+)?", "#", text)
     string = re.sub("https:\\\+([a-zA-Z0-9.]+)?", "@", string)
     return string
 
@@ -93,8 +92,8 @@ class NGram_AA(AttributionModel):
     
     def train_internal(self, params):
         
-        self.train_texts = self.query_df['text'].tolist()
-        self.train_labels = self.query_df['author'].tolist()
+        self.train_texts = self.train_df['text'].tolist()
+        self.train_labels = self.train_df['author'].tolist()
     
         self.vectorizers = {}
         self.train_term_matrix = {}
@@ -104,7 +103,7 @@ class NGram_AA(AttributionModel):
             gram_range, preprocessor = self.get_analyzer_props(analyzer)
             print(f'{analyzer}: building the tf-idf vectorizer for the {analyzer} n-gram model')
             count_vectorizer, tfidf_transformer = get_vectorizers(analyzer=analyzer if 'dist' not in analyzer else 'char',
-                                                                gram_range=gram_range,
+                                                                gram_range=tuple(gram_range),
                                                                 preprocessor=preprocessor,
                                                                 max_features=params.max_features,
                                                                 min_df=params.min_df,
@@ -134,8 +133,8 @@ class NGram_AA(AttributionModel):
                     pickle.dump(vectorizer, f)
                 
     def load_model(self, folder):
-        self.train_texts = self.query_df['text'].tolist()
-        self.train_labels = self.query_df['author'].tolist()
+        self.train_texts = self.train_df['text'].tolist()
+        self.train_labels = self.train_df['author'].tolist()
         
         self.vectorizers = {}
         self.train_term_matrix = {}
@@ -153,9 +152,8 @@ class NGram_AA(AttributionModel):
                     elif vectorizer_type == 'tfidf':
                         self.train_data[analyzer] = self.vectorizers[analyzer][vectorizer_type].transform(self.train_term_matrix[analyzer])
     
-    def evaluate_internal(self, query_df, target_df, df_name=None):
-        # ignoring query_df - in either load_model or train_internal, we have already created self.train_data
-        test_texts = target_df['text'].tolist()
+    def evaluate_internal(self, train_df, test_df, df_name=None):
+        test_texts = test_df['text'].tolist()
         
         self.test_prediction_probabilities = {}
         

@@ -199,23 +199,3 @@ class LuarProcessor:
             rows.append(self.to_author_dict(author, docs))
             
         self.to_jsonl(os.path.join(self.model_folder, f'{self.out_name}.jsonl'), rows)
-        
-"""
-
-salloc -c 16 -G a40
-
-date
-dataset="CrossNews_mini.csv"
-model="luar"
-conda activate luar
-cd /nethome/mma81/storage/CrossNews
-
-python src/train_embedding.py \
---model ${model} \
---train \
---train_file verification_data/train/${dataset} \
---parameter_sets default
-date
-exit
-
-"""

@@ -253,7 +253,7 @@ def create_answers(test_data, models):
     
     true_authors = list(test_data['author'])
     texts = list(test_data['text'])
-    for i in tqdm(range(len(true_authors)), desc='Evaluating on target documents'):
+    for i in tqdm(range(len(true_authors)), desc='Evaluating on test documents'):
         true_author = true_authors[i]
         text = texts[i]
         hs = []
@@ -285,7 +285,7 @@ class PPM_AA(AttributionModel):
         return 'ppm_aa'
     
     def train_internal(self, params):
-        self.models = create_models(self.query_df, params.order, params.alph_size)
+        self.models = create_models(self.train_df, params.order, params.alph_size)
         
     def save_model(self, folder):
         for author, model in self.models.items():
@@ -298,5 +298,5 @@ class PPM_AA(AttributionModel):
                 author = '_'.split(Path(file).stem)[-1]
                 self.models[author] = load_ppm_model(os.path.join(folder, 'ppm_models', file))
         
-    def evaluate_internal(self, query_df, target_df, df_name=None):
-        return create_answers(target_df, self.models)
+    def evaluate_internal(self, train_df, test_df, df_name=None):
+        return create_answers(test_df, self.models)

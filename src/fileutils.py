@@ -24,7 +24,9 @@ def create_unique_folder(model_name, train_file, base_folder):
 def create_model_folder(model_name, train_file, args, params_set, base_folder='models'):
     """Copy corresponding inner dict to a new JSON file in the new folder."""
 
-    new_folder_path = create_unique_folder(model_name, train_file, base_folder)
+    # new_folder_path = create_unique_folder(model_name, train_file, base_folder)
+    new_folder_path = os.path.join(base_folder, model_name, Path(train_file).stem)
+    os.makedirs(new_folder_path, exist_ok=True)
 
     params_file_path = os.path.join(new_folder_path, "params.json")
     with open(params_file_path, 'w') as f:

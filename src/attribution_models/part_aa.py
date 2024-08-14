@@ -7,8 +7,10 @@ import pdb
 from pathlib import Path
 from tqdm import tqdm
 import numpy as np
+import pandas as pd
 
 from attribution_models.attribution_model import AttributionModel
+from embedding_models.part import PART
 
 class PART_AA(AttributionModel):
     
@@ -35,8 +37,20 @@ class PART_AA(AttributionModel):
                 'parameter_sets': [parameter_set['parameter_set']],
                 'evaluation_metric': 'F1'
             }
-        args.query_file = 'CrossNews_Article.csv'
-        self.id_to_embedding = json.load(open(f'gold_embeddings/part/{Path(args.query_file).stem}.json', 'r'))
+            
+        part_parameter_set = json.load(open('src/model_parameters/part.json', 'r'))[parameter_set['parameter_set']]
+        
+        self.part_model = PART(SimpleNamespace(**part_args), part_parameter_set)
+        
+        if hasattr(args, 'train') and args.train:
+            self.part_model.train()
+        elif hasattr(args, 'load') and args.load:
+            self.part_model.load_model(args.load_folder)
+        
+        if 'threshold' in parameter_set:
+            self.threshold = parameter_set['threshold']
+        if 'embedding_folder' in parameter_set:
+            self.embedding_folder = parameter_set['embedding_folder']
     
     def get_model_name(self):
         return 'part_aa'
@@ -51,6 +65,13 @@ class PART_AA(AttributionModel):
         pass
     
     def evaluate_internal(self, query_df, target_df, df_name=None):
+        
+        self.id_to_embedding = {}
+        ids_and_texts = pd.concat([query_df, target_df])[['id', 'text']]
+        ids = ids_and_texts['id'].tolist()
+        texts = ids_and_texts['text'].tolist()
+        for doc_id, embedding in zip(ids, self.part_model.get_embeddings(texts)):
+            self.id_to_embedding[str(doc_id)] = embedding
         
         author_ids = sorted(list(set(target_df['author'])))
         query_embeddings = []

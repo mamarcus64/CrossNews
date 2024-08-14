@@ -1,36 +1,14 @@
 {
-    "default": {
-        "model_folder": "models/part/CrossNews_mini/05-28-04-17-46-taituo",
-        "parameter_set": "testing"
-    },
-    "CrossNews_Article_Article.csv": {
-        "model_folder": "models/part/CrossNews_Article_Article/05-28-04-24-31-bgmdzr",
+    "CrossNews_Article_Article": {
+        "model_folder": "models/part/CrossNews_Article_Article",
         "parameter_set": "default"
     },
-    "CrossNews_Article_Tweet.csv": {
-        "model_folder": "models/part/CrossNews_Article_Tweet/05-28-04-24-42-wbjzxo",
+    "CrossNews_Article_Tweet": {
+        "model_folder": "models/part/CrossNews_Article_Tweet",
         "parameter_set": "default"
     },
-    "CrossNews_Tweet_Tweet.csv": {
-        "model_folder": "models/part/CrossNews_Tweet_Tweet/05-28-04-24-54-hpxnqn",
+    "CrossNews_Tweet_Tweet": {
+        "model_folder": "models/part/CrossNews_Tweet_Tweet",
         "parameter_set": "default"
-    },
-    "CrossNews_Article_Article_short.csv": {
-        "model_folder": "models/part/CrossNews_Article_Article_short/06-01-01-08-24-udveuo",
-        "parameter_set": "default"
-    },
-    "CrossNews_Article_Tweet_short.csv": {
-        "model_folder": "models/part/CrossNews_Article_Tweet_short/06-01-02-01-42-evprxz",
-        "parameter_set": "default"
-    },
-    "CrossNews_mini.csv": {
-        "model_folder": "",
-        "parameter_set": "testing"
-    },
-    "empty.csv": {
-        "model_folder": "models/part/empty/06-01-00-23-19-kchrxg",
-        "parameter_set": "no_train",
-        "threshold": 0.65,
-        "embedding_folder": "models/part_av/empty/06-01-06-24-20-ygsdnm/embeddings"
     }
 }

@@ -37,8 +37,8 @@ def crossnews_helper(data, first_genre, second_genre, seed, max_docs_per_author,
         print_pair_stats(pairs, save=save_name)
 
 def create_crossnews():
-    gold = json.load(open('raw_data/crossnews_gold.json', 'r', encoding='utf-8'))
-    silver = json.load(open('raw_data/crossnews_silver.json', 'r', encoding='utf-8'))
+    gold = json.load(open('raw_data/crossnews_gold_sampled.json', 'r', encoding='utf-8'))
+    silver = json.load(open('raw_data/crossnews_silver_sampled.json', 'r', encoding='utf-8'))
 
     gold_authors = {}
     silver_authors = {}
@@ -95,40 +95,26 @@ def create_crossnews():
                             max_docs_per_author=100,
                             save_name='verification_data/train/CrossNews_Tweet_Tweet.csv')
     
-def create_crossnews_attribution(seed=1234):
+def create_crossnews_attribution(seed=1234, known_per_author=5, unknown_per_author=3):
     os.makedirs('attribution_data', exist_ok=True)
-    os.makedirs('attribution_data/query', exist_ok=True)
+    os.makedirs('attribution_data/train', exist_ok=True)
     os.makedirs('attribution_data/test', exist_ok=True)
     
     random.seed(seed)
     
-    gold = json.load(open('raw_data/crossnews_gold.json', 'r', encoding='utf-8'))
+    gold = json.load(open('raw_data/crossnews_gold_sampled.json', 'r', encoding='utf-8'))
     random.seed(seed)
     random.shuffle(gold)
     
-    query_df, test_df = generate_attribution_data(gold, ['Article', 'Tweet'], query_num=60, target_num=30)
+    query_df, test_df = generate_attribution_data(gold, ['Article', 'Tweet'], query_num=known_per_author, target_num=unknown_per_author)
     
     article_queries = query_df[query_df['genre'] == 'Article']
     tweet_queries = query_df[query_df['genre'] == 'Tweet']
     
-    both_query_list = []
-    mini_query_list = []
-    authors = set(query_df['author'])
-    for author in authors:
-        both_query_list.append(query_df[(query_df['author'] == author) & (query_df['genre'] == 'Article')].sample(15, random_state=seed))
-        both_query_list.append(query_df[(query_df['author'] == author) & (query_df['genre'] == 'Tweet')].sample(15, random_state=seed))
-        mini_query_list.append(query_df[(query_df['author'] == author)].sample(1))
-    both_queries = pd.concat(both_query_list)
-    mini_queries = pd.concat(mini_query_list)
-    
-    assert article_queries.shape == tweet_queries.shape == both_queries.shape
-    
-    article_queries.to_csv('attribution_data/query/CrossNews_Article.csv', index=False, quoting=csv.QUOTE_ALL)
-    tweet_queries.to_csv('attribution_data/query/CrossNews_Tweet.csv', index=False, quoting=csv.QUOTE_ALL)
-    both_queries.to_csv('attribution_data/query/CrossNews_Both.csv', index=False, quoting=csv.QUOTE_ALL)
-    mini_queries.to_csv('attribution_data/query/CrossNews_Mini.csv', index=False, quoting=csv.QUOTE_ALL)
+    article_queries.to_csv('attribution_data/train/CrossNews_Article.csv', index=False, quoting=csv.QUOTE_ALL)
+    tweet_queries.to_csv('attribution_data/train/CrossNews_Tweet.csv', index=False, quoting=csv.QUOTE_ALL)
     test_df.to_csv('attribution_data/test/CrossNews.csv', index=False, quoting=csv.QUOTE_ALL)
     
 if __name__ == '__main__':
-    # create_crossnews()
+    create_crossnews()
     create_crossnews_attribution()

@@ -1,5 +1,4 @@
 from sklearn.metrics import precision_score, accuracy_score, recall_score, f1_score, roc_auc_score
-import json
 import statistics
 
 def evaluate_scores(predictions, labels, threshold=0.5):

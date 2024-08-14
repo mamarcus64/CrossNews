@@ -44,6 +44,8 @@ class STEL_AV(VerificationModel):
         
         if hasattr(args, 'train') and args.train:
             self.stel_model.train()
+        elif hasattr(args, 'load') and args.load:
+            self.part_model.load_model(args.load_folder)
         
         if 'threshold' in parameter_set:
             self.threshold = parameter_set['threshold']
@@ -114,27 +116,3 @@ class STEL_AV(VerificationModel):
         labels = df['label'].tolist()
         return [0.5 - (distance - self.threshold) / (1 - self.threshold) * 0.5 if distance >= self.threshold 
                 else 0.5 + (self.threshold - distance) / (self.threshold) * 0.5 for distance in distances], labels
-
-"""
-salloc -c 16 -G a40
-
-date
-dataset="CrossNews_mini.csv"
-model="stel_av"
-conda activate stel
-cd /nethome/mma81/storage/CrossNews
-
-python src/run_verification.py \
---model ${model} \
---train \
---train_file verification_data/train/${dataset} \
---parameter_sets default \
---test \
---test_files verification_data/test/CrossNews_Tweet_Tweet.csv \
-verification_data/test/CrossNews_Article_Article.csv \
-verification_data/test/CrossNews_Article_Tweet.csv
-
-date
-exit
-
-"""

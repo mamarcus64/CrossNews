@@ -18,6 +18,7 @@ class LLM_Prompting_AA(AttributionModel):
     def __init__(self, args, parameter_set):
         self.llm_model_type = parameter_set['llm_model']
         self.prompt_type = parameter_set['prompt']
+        self.docs_per_author = 3
         super().__init__(args, parameter_set)
         
         self.llm_model = transformers.pipeline(
@@ -36,7 +37,7 @@ class LLM_Prompting_AA(AttributionModel):
         
     
     def get_model_name(self):
-        return f'prompting_aa_{self.prompt_type}' if '70B' not in self.llm_model_type else f'prompting_aa_{self.prompt_type}_big'
+        return f'prompting_aa_{self.args.parameter_set}'
     
     def train_internal(self, params):
         pass
@@ -68,8 +69,6 @@ class LLM_Prompting_AA(AttributionModel):
             prompt = f'{prompt}TEXTS FROM AUTHOR {author}:{x}{y}{x}'
         
         prompt = f"{prompt}Respond ONLY with the sorted list of potential authors, from most likely to least likely. Respond ONLY in the format, '[{','.join(authors)}]'. Do not include anything else in your response."
-        with open('test.txt', 'w', encoding='utf-8') as out:
-            out.write(prompt)
         return prompt
             
     def prompt_model(self, query, examples):
@@ -87,24 +86,24 @@ class LLM_Prompting_AA(AttributionModel):
         return result
     
     
-    def evaluate_internal(self, query_df, target_df, df_name=None):
+    def evaluate_internal(self, train_df, test_df, df_name=None):
         
-        author_ids = sorted([int(x) for x in list(set(query_df['author']))])
+        author_ids = sorted([int(x) for x in list(set(train_df['author']))])
         examples = {}
                 
         for author in author_ids:
-            docs = list(query_df[query_df['author'] == author]['text'])
-            if len(docs) < 3:
+            docs = list(train_df[train_df['author'] == author]['text'])
+            if len(docs) < self.docs_per_author:
                 examples[author] = docs
             else:
-                examples[author] = random.sample(docs, 3)
+                examples[author] = random.sample(docs, self.docs_per_author)
             
         all_scores = []
         responses = []
         
         valid_responses = 0
-        for i in tqdm(list(range(len(target_df)))):
-            row = target_df.iloc[i]
+        for i in tqdm(list(range(len(test_df)))):
+            row = test_df.iloc[i]
             query = row['text']
             
             response = self.prompt_model(query, examples)
@@ -114,7 +113,7 @@ class LLM_Prompting_AA(AttributionModel):
                 prediction_list = literal_eval(response)
                 prediction_list = [int(x) for x in prediction_list]
                 
-                scores = [-999 + random.random()] * len(author_ids)
+                scores = [-999 + random.random()] * len(author_ids) # random noise until updated
                 for i, prediction in enumerate(prediction_list):
                     if 0 <= prediction < len(scores):
                         scores[prediction] = -i
@@ -126,27 +125,6 @@ class LLM_Prompting_AA(AttributionModel):
             
             all_scores.append(scores)
             
-        #     authors_per_prompt = 4
-            
-        #     subsample = random.sample(author_ids, len(author_ids))
-            
-        #     while len(subsample) > 1:
-        #         most_likelies = []
-                
-                
-        #         for i in range(0, len(subsample), authors_per_prompt):
-        #             prompt_authors = subsample[i:i+authors_per_prompt]
-        #             if len(prompt_authors) == 1:
-        #                 most_likelies.append(i)
-        #                 continue
-        #             response = self.prompt_model(query, {k: v for k, v in examples.items() if k in prompt_authors})
-        #             most_likelies.append(int(response))
-        #         print(len(subsample), len(most_likelies))
-        #         subsample = random.sample(most_likelies, len(most_likelies))
-            
-        #     score = [random.random() * 0.001 for _ in author_ids] # small random noise so there isn't a tie in sorting
-        #     score[subsample[0]] += 1
-        #     all_scores.append(score)
         print(f'Valid Responses: {valid_responses} / {len(all_scores)}')
             
         return all_scores, responses
