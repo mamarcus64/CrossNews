@@ -1,5 +1,5 @@
 # CrossNews
-Data and experimental code for the CrossNews authorship dataset. To fit within size limits, a sample of CrossNews has been selected for the code appendix and is present in the `raw_data` folder. A sample of the silver and the gold data is present, with each document in the relevant json file having an `id`, an `author`, a `genre`, and the document `text` as well. Gold articles also have a `topic` field.
+Data and experimental code for the CrossNews authorship dataset, presented in the paper `CROSSNEWS: A Cross-Genre Authorship Verification and Attribution Benchamrk` (link to be added). The gold and silver data of CrossNews is present in the `raw_data` zip file, with each document in the relevant json file having an `id`, an `author`, a `genre`, and the document `text` as well. Gold articles also have a `topic` field.
 
 
 ## Conda Environment Installation
@@ -9,7 +9,7 @@ Please run the following code to generate and activate the CrossNews conda envir
 conda env create -f conda_environments/authorship.yaml
 conda activate authorship
 ```
-The conda environments `luar.yaml`, `part.yaml`, and `stel.yaml` can also be used for each of the LUAR, PART, and STEL embedding methods in the full release of CrossNews. However, implementations of these models in the code appendix are unlikely to perform well given the small amount of data that is uploaded, as each embedding model in the paper is trained on the full silver set.
+The conda environments `luar.yaml`, `part.yaml`, and `stel.yaml` can also be used for each of the LUAR, PART, and STEL embedding methods in the full release of CrossNews.
 
 ## Usage
 
