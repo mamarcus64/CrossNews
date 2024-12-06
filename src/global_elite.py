@@ -12,6 +12,15 @@ global_ids = json.load(open('attribution_data/test/global_doc_ids.json', 'r'))
 gold = json.load(open('raw_data/crossnews_gold.json', 'r', encoding='utf-8'))
 # id_to_embedding = json.load(open('gold_embeddings/luar/CrossNews_Article.json', 'r'))
 # id_to_embedding = json.load(open('gold_embeddings/part/CrossNews_Article.json', 'r'))
+# id_to_embedding = json.load(open('gold_embeddings/stel/CrossNews_Article.json', 'r'))
+
+# id_to_embedding = json.load(open('gold_embeddings/luar/CrossNews_Tweet.json', 'r'))
+# id_to_embedding = json.load(open('gold_embeddings/part/CrossNews_Tweet.json', 'r'))
+id_to_embedding = json.load(open('gold_embeddings/stel/CrossNews_Tweet.json', 'r'))
+
+# t = 0.8 # LUAR
+# t = 0.65 # PART
+t = 0.6 # STEL
 
 
 def generate_verification_pairs(pair_num=1000, seed=345):
@@ -97,36 +106,88 @@ def generate_attribution_pairs(seed=345, is_standard=False):
         query_df.to_csv('attribution_data/query/global_standard.csv', index=False, quoting=csv.QUOTE_ALL)
         target_df.to_csv('attribution_data/test/global_standard.csv', index=False, quoting=csv.QUOTE_ALL)
     
-def print_accuracy(pairs, threshold=0.65):
+def print_accuracy(pairs, threshold=t):
     predictions, labels = [], []
     for pair in tqdm(pairs):
-        label, id1, id2 = pair
+        label, id1, id2 = pair[0], pair[-2], pair[-1]
         distance = cosine(id_to_embedding[str(id1)], id_to_embedding[str(id2)])
         predictions.append(1 if distance < threshold else 0)
         labels.append(label)
         
     print(sum(labels))
     print(sum([1 if label == prediction else 0 for label, prediction in zip(labels, predictions)]) / len(pairs))
+    print(sum(predictions) / len(pairs))
 
 # pairs = generate_verification_pairs()
-generate_attribution_pairs(is_standard=True)
-generate_attribution_pairs(is_standard=False)
-# print_accuracy(pairs)
+
+df = pd.read_csv('verification_data/test/global_elite_tweet.csv')
+
+pairs = [tuple(row) for row in df.itertuples(index=False)]
+
+print_accuracy(pairs)
 
 # pdb.set_trace()
 
 
 
-"""
+""" For Tweet experiment
+
+salloc -c 8
 python src/run_verification.py --model ngram \
---load --load_folder models/ngram/CrossNews_Article_Article/05-27-12-27-49-hokftf \
+--load --load_folder models/ngram/CrossNews_Tweet_Tweet/05-26-20-30-52-pxefdm \
 --parameter_sets default --test \
---test_files verification_data/test/global_elite.csv 
+--save_folder tweet_topic \
+--test_files verification_data/test/glclobal_elite_tweet.csv
+exit
 
-
+salloc -c 8
 python src/run_verification.py --model ppm \
---load --load_folder models/ppm/CrossNews_Article_Article/05-27-12-28-39-ntcdsm \
+--load --load_folder models/ppm/CrossNews_Tweet_Tweet/05-26-20-31-27-pghdca \
 --parameter_sets default --test \
---test_files verification_data/test/global_elite.csv 
+--save_folder tweet_topic \
+--test_files verification_data/test/global_elite_tweet.csv 
+exit
+
+salloc -c 8 -G a40
+python src/run_verification.py --model o2d2 \
+--load --load_folder models/O2D2/CrossNews_Tweet_Tweet/05-27-12-30-01-otvukz \
+--parameter_sets default --test \
+--save_folder tweet_topic \
+--test_files verification_data/test/global_elite_tweet.csv
+exit
+
+Attribution
+
+
+salloc -c 8
+
+# dataset="global_elite_tweet.csv"
+dataset="global_standard_tweet.csv"
+
+# model="luar_aa"
+# model="part_aa"
+model="stel_aa"
+conda activate luar
+
+# model="ngram_aa"
+# model="ppm_aa"
+# conda activate AuthorID_copy
+
+cd /nethome/mma81/storage/CrossNews
+
+date
+python src/run_attribution.py \
+--model ${model} \
+--train \
+--query_file attribution_data/query/${dataset} \
+--parameter_sets default \
+--save_folder tweet_topic \
+--test \
+--target_file attribution_data/test/${dataset}
+date
+
+exit
+
+
 
 """

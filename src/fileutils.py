@@ -16,7 +16,7 @@ def create_unique_folder(model_name, train_file, base_folder):
     unique_string = generate_unique_string()
 
     # Create folder with the unique name
-    folder_path = os.path.join(base_folder, model_name, Path(train_file).stem, unique_string)
+    folder_path = os.path.join(base_folder, model_name, Path(train_file).stem)
     os.makedirs(folder_path, exist_ok=True)
 
     return folder_path

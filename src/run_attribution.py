@@ -46,6 +46,9 @@ def main(args):
         elif args.model == 'llm_prompting_aa':
             from attribution_models.llm_prompting_aa import LLM_Prompting_AA
             model = LLM_Prompting_AA(args, parameter_set)
+        elif args.model == 'llm_embedding_aa':
+            from attribution_models.llm_embedding_aa import LLM_Embedding_AA
+            model = LLM_Embedding_AA(args, parameter_set)
         
         debug_print(f"Created model (parameters {parameter_set_name}) at {model.model_folder}")
         

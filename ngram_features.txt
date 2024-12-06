@@ -1,0 +1,20 @@
+Frequency of Word 1-gram & said & 0.215\\
+Frequency of Word 1-gram & trump & 0.198\\
+Frequency of Char 3-gram & gam & 0.187\\
+Frequency of Part of Speech 1-gram & : & 0.168\\
+Frequency of Char 1-gram & " & 0.167\\
+Average Number of Specific Char per Word & 0 & 0.166\\
+Average Word Length of Specific Part of Speech & NNPS & 0.165\\
+Frequency of Word 1-gram & says & 0.164\\
+Frequency of Char 1-gram & ' & 0.156\\
+Frequency of Char 2-gram & -[space] & 0.151\\
+Average Word Length of Specific Part of Speech & WP\$ & 0.151\\
+Frequency of Char 2-gram & "[space] & 0.149\\
+Frequency of Word 1-gram & her & 0.148\\
+Frequency of Char 1-gram & ' & 0.145\\
+Average Word Length of Specific Part of Speech & POS & 0.144\\
+Frequency of Char 1-gram & ; & 0.139\\
+Frequency of Part of Speech 2-gram & , CC & 0.135\\
+Frequency of Part of Speech 1-gram & WP\$ & 0.134\\
+Frequency of Char 1-gram & ’ & 0.129\\
+Frequency of Char 1-gram & : & 0.126\\

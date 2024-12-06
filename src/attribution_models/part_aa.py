@@ -35,7 +35,11 @@ class PART_AA(AttributionModel):
                 'parameter_sets': [parameter_set['parameter_set']],
                 'evaluation_metric': 'F1'
             }
-        args.query_file = 'CrossNews_Article.csv'
+        # args.query_file = 'CrossNews_Article.csv'
+        if 'article' in args.query_file.lower():
+            args.query_file = 'CrossNews_Article'
+        if 'tweet' in args.query_file.lower():
+            args.query_file = 'CrossNews_Tweet'
         self.id_to_embedding = json.load(open(f'gold_embeddings/part/{Path(args.query_file).stem}.json', 'r'))
     
     def get_model_name(self):

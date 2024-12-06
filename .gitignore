@@ -7,3 +7,14 @@ pairs
 verification_data
 src/verification_models/O2D2/cc.en.300.bin
 src/verification_models/pos_tagger
+20_author_results
+attribution_data
+gold_embeddings
+lightning_logs
+logs
+models
+prompt_testing
+runs
+tweet_topic
+prompting
+old_stuff

@@ -46,7 +46,13 @@ class LUAR_AA(AttributionModel):
        
         # if 'embedding_folder' in parameter_set:
             # self.embedding_folder = parameter_set['embedding_folder']
-        args.query_file = 'CrossNews_Article.csv'
+        # args.query_file = 'CrossNews_Article.csv'
+        if 'article' in args.query_file.lower():
+            args.query_file = 'CrossNews_Article'
+        if 'tweet' in args.query_file.lower():
+            args.query_file = 'CrossNews_Tweet'
+        
+        
         self.id_to_embedding = json.load(open(f'gold_embeddings/luar/{Path(args.query_file).stem}.json', 'r'))
     
     def get_model_name(self):

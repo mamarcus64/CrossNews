@@ -49,7 +49,7 @@ class LLM_Prompting(VerificationModel):
         if self.prompt_type == "task_only":
             instruction = instruction
         elif self.prompt_type == "prompt_av":
-            instruction = f"{instruction} Here are some relevant variables to this problem.\n1. punctuation style\n2. special characters\n3. acronyms and abbreviations\n4. writing style\n5.expressions and idioms\n6. tone and mood\n7. sentence structure\n8. any other relevant aspect\nUnderstand the problem, extracting relevant variables and devise a plan to solve the problem. Then carry out the plan."
+            instruction = f"{instruction} Here are some relevant variables to this problem.\n1. punctuation style\n2. special characters\n3. acronyms and abbreviations\n4. writing style\n5.expressions and idioms\n6. tone and mood\n7. sentence structure\n8. any other relevant aspect\nUnderstand the problem, extracting relevant variables and devise a plan to solve the problem. Then carry out the plan. Remember to provide your answer ONLY with True or False. Do NOT respond with anything other than \"True\" or \"False\"."
         elif self.prompt_type == "lip":
             instruction = f"{instruction} Analyze the writing styles of the input texts, disregarding the differences in topic and content. Reason based on linguistic features such as phrasal verbs, modal verbs, punctuation, rare words, affixes, quantities, humor, sarcasm, typographical errors, and misspellings."
         prompt = f"{instruction}\n\nInput Text 1: {text0}\n\nInput Text 2: {text1}\n\nAnswer:"

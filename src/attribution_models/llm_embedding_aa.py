@@ -10,40 +10,21 @@ import numpy as np
 
 from attribution_models.attribution_model import AttributionModel
 
-class STEL_AA(AttributionModel):
+class LLM_Embedding_AA(AttributionModel):
     
     def __init__(self, args, parameter_set):
         super().__init__(args, parameter_set)
-        if hasattr(args, 'load') and args.load:
-            stel_args = {
-                'model': 'stel',
-                'train': False,
-                'load': True,
-                'load_folder': parameter_set['model_folder'],
-                'parameter_sets': [parameter_set['parameter_set']],
-                'evaluation_metric': 'F1'
-            }
-        elif hasattr(args, 'train') and args.train:
-            stel_args = {
-                'model': 'stel',
-                'load': False,
-                'train': True,
-                'save_folder': args.save_folder,
-                'train_file': args.query_file,
-                'seed': 1234,
-                'eval_ratio': 0.2,
-                'parameter_sets': [parameter_set['parameter_set']],
-                'evaluation_metric': 'F1'
-            }
-        # args.query_file = 'CrossNews_Article.csv'
-        if 'article' in args.query_file.lower():
-            args.query_file = 'CrossNews_Article'
-        if 'tweet' in args.query_file.lower():
-            args.query_file = 'CrossNews_Tweet'
-        self.id_to_embedding = json.load(open(f'gold_embeddings/stel/{Path(args.query_file).stem}.json', 'r'))
+        
+        self.train_embedding_loc = parameter_set['train_embedding_loc']
+        self.test_embedding_loc = parameter_set['test_embedding_loc']
+        
+        self.id_to_embedding = json.load(open(self.train_embedding_loc, 'r'))
+        print('loaded train')
+        self.id_to_embedding.update(json.load(open(self.test_embedding_loc, 'r')))
+        print('loaded test')
     
     def get_model_name(self):
-        return 'stel_aa'
+        return self.parameter_set['name']
     
     def train_internal(self, params):
         pass
@@ -61,6 +42,7 @@ class STEL_AA(AttributionModel):
                 
         for author in author_ids:
             author_doc_ids = list(query_df[query_df['author'] == author]['id'])
+            # import pdb; pdb.set_trace()
             query_embeddings.append(np.array([self.id_to_embedding[str(id)] for id in author_doc_ids]).mean(axis=0).tolist())
             
         all_distances = []
