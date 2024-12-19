@@ -10,7 +10,7 @@ import numpy as np
 
 from attribution_models.attribution_model import AttributionModel
 
-class LLM_Embedding_AA(AttributionModel):
+class SELMA(AttributionModel):
     
     def __init__(self, args, parameter_set):
         super().__init__(args, parameter_set)

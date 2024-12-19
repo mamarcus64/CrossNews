@@ -1,0 +1,22 @@
+{
+    "mistral_prompt_taskonly": {
+        "train_embedding_loc": "selma_embeddings/mistral/train.json",
+        "test_embedding_loc": "selma_embeddings/mistral/test_prompt_taskonly.json",
+        "name": "mistral_prompt_taskonly"
+    },
+    "mistral_prompt_av": {
+        "train_embedding_loc": "selma_embeddings/mistral/train.json",
+        "test_embedding_loc": "selma_embeddings/mistral/test_prompt_av.json",
+        "name": "mistral_prompt_av"
+    },
+    "mistral_prompt_lip": {
+        "train_embedding_loc": "selma_embeddings/mistral/train.json",
+        "test_embedding_loc": "selma_embeddings/mistral/test_prompt_lip.json",
+        "name": "mistral_prompt_lip"
+    },
+    "mistral_no_prompt": {
+        "train_embedding_loc": "selma_embeddings/mistral/train.json",
+        "test_embedding_loc": "selma_embeddings/mistral/no_prompt.json",
+        "name": "mistral_no_prompt"
+    }
+}
