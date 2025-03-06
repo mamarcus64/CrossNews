@@ -41,7 +41,7 @@ python src/run_attribution.py \
 --query_file attribution_data/query/CrossNews_Article.csv \
 --parameter_sets default \
 --test \
---target_file attribution_data/test/CrossNews_Tweet.csv
+--target_file attribution_data/test/CrossNews.csv
 ```
 
 To train embedding models, see `src/train_embedding.py`. To use SELMA, the embeddings must be generated first. See `src/generate_selma_embeddings.py` for more details.
